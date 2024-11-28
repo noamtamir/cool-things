@@ -1,0 +1,9 @@
+baseURL: https://localhost
+languageCode: en-us
+title: Something cool I learned today
+theme: ["PaperMod"]
+
+params:
+  defaultTheme: dark
+  disableThemeToggle: true
+  timeZone: Europe/Madrid
