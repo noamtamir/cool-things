@@ -1,6 +1,6 @@
-baseURL: https://localhost
+baseURL: https://noamtamir.github.io/cool-things
 languageCode: en-us
-title: Something cool I learned today
+title: "> Something cool I learned today"
 theme: ["PaperMod"]
 
 params:
