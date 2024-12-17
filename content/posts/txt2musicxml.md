@@ -7,16 +7,16 @@ tags:
     - antlr
     - cli
 ---
-Whenever I learn or write a new song, I am usually next to my computer, and I found that the easiest way for me to write down the chords, is to just open up a simple text editor and write it quickly with a super simple syntax.
+Whenever I learn a new song, I found that the easiest way for me to write down the chords, is to just open up a simple text editor on my computer and write it using a super simple syntax.
 
 <!--more-->
 ---
 > #### TL;DR:
-> Turn this:
+> I built **[txt2musicxml](https://github.com/noamtamir/txt2musicxml)**, a cli tool that turns this:
 > ```
 > Cmaj7 | A7 | Dm9 | G7b9 |
 > ```
-> Into this:
+> into this:
 > ![](/txt2musicxml/chords.png)
 
 ---
@@ -32,12 +32,12 @@ Full example:
 Cmaj7 | A7 | Dm9 | G7b9 |
 ```
 
-The problem is that, although quite simple and fast, it is very ugly and not super comfortable to read while playing it back. So I built a CLI tool that parses this input and turns into something more meaningful: MusicXML.
+Although quite simple and fast to write, it is ugly and not comfortable to read while playing it back. So I built a [CLI tool](https://github.com/noamtamir/txt2musicxml) that turns this into something more meaningful: MusicXML.
 
-MusicXML is a pretty good standard, mainly because it is widely accepted. I don't know of any music software that doesn't have MusicXML import/export. It's not an easy standard, but the end user doesn't need to know the details. The important thing is that with my new tool I can turn my simple chord syntax into MusicXML, and then import it into my favorite software to render it. Luckily, MuseScore is open source, and has a CLI tool that can turn MusicXML into pdf in 1 cli command.
+MusicXML is a pretty good standard, mainly because it is widely accepted. I don't know of any music software that doesn't support it. It's not an easy standard, but the end user doesn't need to know the details. The important thing is that with my new tool I can turn my simple chord syntax into MusicXML, and then import it into my favorite music notation software to render it.
 
 ### Antlr
-Well, I had no idea how to do that. Luckily, I found Antlr, which is a really cool open source software to create lexers and parsers (and more) in your favorite programming language. You basically define your language's grammar in a single file in a straightforward syntax, that is very much similar to regex. The hard part was learning the theory behind it. What is a language, what is a lexer, what is a parser, etc. So here are some of the important concepts I learned:
+Well, I had no idea how to do that. Luckily, I found [Antlr](https://www.antlr.org/). It is an open source software to create lexers and parsers (and more) in your favorite programming language. You basically define your new language's grammar in a single file with a simple syntax, very similar to regex. The hard part was learning the theory behind it. What is a language, what is a lexer, what is a parser, etc. So here are some of the important concepts I learned:
 ![](/txt2musicxml/antlr_process.png)
 
 #### Tokens
@@ -54,14 +54,14 @@ into:
 ```
 
 #### Parser
-A parser gives meaning to tokens. It takes each token in the stream and assigns it a meaning. It also turns it into something called a parse-tree.
+A parser gives structural meaning to tokens. It turns the stream of tokens into something called a parse-tree.
 In our examples, it would be something like this:
 ![](/txt2musicxml/parsetree.png)
 
 > We can start seeing patterns and meaning in our language :)
 
 #### Visitor (AST)
-A Parser Tree still contains all the original text, but a lot of this is not necessarily important to be able to do something with it. We need to simplify our tree to a model that makes more sense. Generically this is called an AST (Abstract Syntax Tree). In our case I will call it a "Sheet". Antlr has a concept of a Visitor, which walks over all the nodes of the parse tree, and does something with them. In my case, it turned the parse-tree into python classes that have significant relationships with them. A Sheet contains lines, lines contain bars, bars contain chords, a chord has a root, and possibly a suffix and a bass, etc. In our example, it would be something like this (simplified):
+A parse-tree still contains all the original text, but a lot of it is redundant. We need to simplify our tree to a model that makes more sense. This is called an AST (Abstract Syntax Tree). In our case I will call it a "Sheet". Antlr has a concept of a Visitor, which walks over all the nodes of the parse tree, and does something with them. In my case, I turned the parse-tree into python classes that have meaningful relationships. A Sheet contains lines, lines contain bars, bars contain chords, a chord has a root, and possibly a suffix and a bass, etc. In our example, it would be something like this (simplified):
 ```python
 Sheet(lines=[
     Line(bars=[
@@ -85,9 +85,9 @@ The result is this:
 ```
 > Yikes!
 
-### What to do with this XML???
-Save it as a file and you can open it with any music software that supports it (all of them basically).
-MuseScore is an open source software, and it's pretty feature rich. Luckily, they have a CLI tool that let's you import/export files. I believe it was originally intended to help with batch conversions, but we can use it for our own benefits. The CLI I wrote accepts chord text in stdin, and spits XML in stdout, it's fully pipe-able and redirectable. So you can do whatever you want in one line.
+### What to do with this XML?
+The CLI I wrote accepts chord text in stdin, and spits XML in stdout, it's fully pipe-able and redirectable. So you can do whatever you want in one line. Save it as a file and you can open it with your favorite music notation software!
+MuseScore is an open source software, and it's pretty feature rich. They have a CLI tool that let's you import/export files. Here are some examples:
 
 Pipe a string of chords into the cli and get the xml:
 ```shell
@@ -99,7 +99,7 @@ or redirect input/output from/to a file:
 txt2musicxml < path/to/Thriller.crd > path/to/Thriller.musicxml
 ```
 
-or convert it directly to pdf using Musescore:
+or convert it in 1 line to pdf using Musescore:
 ```shell
 TMPSUFFIX=.musicxml; mscore -o path/to/output.pdf =(txt2musicxml < path/to/input.crd)
 ```
