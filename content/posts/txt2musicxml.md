@@ -1,5 +1,5 @@
 ---
-date: '2024-11-27T00:12:40+01:00'
+date: '2024-12-17T00:12:40+01:00'
 title: 'Converting simple text into beautiful chord sheets'
 draft: false
 tags:
