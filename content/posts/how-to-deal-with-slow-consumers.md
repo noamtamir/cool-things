@@ -30,7 +30,15 @@ We needed to find a way to speed things up. We noticed that the reason for our s
 
 I was taught that whenever you are waiting on I/O, it means you should use concurrency. Let’s call DynamoDB async. Boto3 library doesn’t support async, but aioboto3 does\! There’s just one problem. Even if we send our requests async, python is not gonna be doing anything else while waiting, because we are only consuming 1 message at a time. To illustrate this, the process would be something like this:
 
-`consume 1 message -> send "async" request to dynamodb -> ready to process any other async job... but there is none ... -> receive response -> commit offset to kafka -> consume 1 message -> etc...`
+```
+-> consume 1 message
+-> send "async" request to dynamodb
+-> ready to process any other async job... but there is none ...
+-> receive response
+-> commit offset to kafka
+-> consume 1 message
+-> etc...
+```
 
 Kafka consumers consume in order. We use manual commit to avoid losing messages in case of failures (which is not the subject of this post, but you can read more about it [here](https://medium.com/@rramiz.rraza/kafka-programming-different-ways-to-commit-offsets-7bcd179b225a#:~:text=Caution%20with%20auto%20commit)). This slows things down. And doesn’t allow us to utilize concurrency very well.
 
